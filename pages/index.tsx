@@ -1,7 +1,9 @@
+import { useRouter } from "next/router";
 import { ReactElement, useEffect, useRef, useState } from "react";
-
 import styled from "styled-components";
-import { User } from "../hooks/user";
+
+import { Loading } from "../components/Loading";
+import { useUser, User } from "../hooks/user";
 
 type MessageType = {
   id: string;
@@ -11,6 +13,8 @@ type MessageType = {
 
 export default function ChatPage(): ReactElement {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const user = useUser();
+  const router = useRouter();
 
   const [messages] = useState<MessageType[]>([]);
 
@@ -20,6 +24,14 @@ export default function ChatPage(): ReactElement {
         messagesContainerRef.current.scrollHeight;
     }
   }, []);
+
+  if (user.loading) {
+    return <Loading />;
+  }
+
+  if (!user.user) {
+    router.push("/login");
+  }
 
   return (
     <Container>
@@ -56,7 +68,7 @@ const MessagesContainer = styled.div`
   padding: 5px;
 
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
   height: 100%;
 
   display: flex;

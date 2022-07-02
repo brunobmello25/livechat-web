@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext } from "react";
+import { useEffect, useState, createContext, useContext } from "react";
 
 export type User = {
   name: string;
@@ -7,9 +7,10 @@ export type User = {
 export type ContextProps = {
   user: User | null;
   loading: boolean;
+  updateUser: (user: User) => void;
 };
 
-const UserContext = createContext<ContextProps>({ user: null, loading: false });
+const UserContext = createContext<ContextProps>({} as ContextProps);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -31,11 +32,32 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
+  function updateUser(newUser: User) {
+    try {
+      setLoading(true);
+
+      localStorage.setItem("user", JSON.stringify(newUser));
+
+      setUser(newUser);
+    } catch (error) {
+      console.error(error);
+      alert("Ocorreu um erro desconhecido. Verifique o console.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <UserContext.Provider value={{ loading, user }}>
+    <UserContext.Provider value={{ loading, user, updateUser }}>
       {children}
     </UserContext.Provider>
   );
 };
 
-export { UserContext, UserProvider };
+function useUser() {
+  const context = useContext(UserContext);
+
+  return context;
+}
+
+export { UserContext, UserProvider, useUser };

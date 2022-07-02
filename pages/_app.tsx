@@ -5,13 +5,16 @@ import { darkTheme } from "../constants/theme";
 import { SocketProvider } from "../hooks/socket";
 
 import "../css/reset.css";
+import { UserProvider } from "../hooks/user";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <SocketProvider>
         <ThemeProvider theme={darkTheme}>
-          <Component {...pageProps} />
+          <UserProvider>
+            <Component {...pageProps} />
+          </UserProvider>
         </ThemeProvider>
       </SocketProvider>
     </>
